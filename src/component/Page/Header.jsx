@@ -1,123 +1,120 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../../Redux/Auth/Action';
+import LoginDropdown from '../Auth/LoginDropdown';
 
-const Header = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
+function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false); // State to manage login popup visibility
+
+  const isLoggedIn = useSelector((state) => !!state.auth.jwt);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleCreateAccount = () => {
-    navigate("/signup"); // Navigate to the Sign-Up page
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const toggleProfileDropdown = () => setIsProfileDropdownOpen(!isProfileDropdownOpen);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    setIsProfileDropdownOpen(false);
+    navigate('/');
   };
 
+  const handleLoginClick = () => {
+    setIsLoginPopupOpen(prevState => !prevState); // Toggle the login popup state
+  };
+
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.profile-dropdown') && isProfileDropdownOpen) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isProfileDropdownOpen]);
+
   return (
-    <header className="bg-white shadow-md">
-      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Logo */}
-        <div className="text-xl font-bold text-gray-800">
-          <a href="/">OnlineDelivery</a>
-        </div>
+    <header className="sticky top-0 z-50 flex items-center justify-between px-4 md:px-16 py-8 bg-white shadow-lg">
+      <div className="">
+        <Link to="/">
+          <a href="#">online food delivery</a>
+        </Link>
+      </div>
 
-        {/* Navigation Links */}
-        <nav className="flex space-x-6">
-          <a href="/restaurant" className="text-gray-700 hover:text-gray-900">
-            Restaurant
-          </a>
-          <a href="/drinks" className="text-gray-700 hover:text-gray-900">
-            Drinks
-          </a>
-          <a href="/market" className="text-gray-700 hover:text-gray-900">
-            Market
-          </a>
-          <a href="/more" className="text-gray-700 hover:text-gray-900">
-            More
-          </a>
+      <div className="md:hidden">
+        <button onClick={toggleMobileMenu} className="text-gray-700 hover:text-gray-900 focus:outline-none">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+          </svg>
+        </button>
+      </div>
+
+      <div className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <button onClick={toggleMobileMenu} className="absolute top-4 right-4 text-gray-700 hover:text-gray-900 focus:outline-none">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <nav className="flex flex-col space-y-4 px-6 py-16">
+          <Link to="/" className="hover:text-gray-500" onClick={toggleMobileMenu}>Restaurants</Link>
+          <Link to="/find-company" className="hover:text-gray-500" onClick={toggleMobileMenu}>Drinks</Link>
+          <Link to="/blog" className="hover:text-gray-500" onClick={toggleMobileMenu}>Market</Link>
+          <Link to="/contact-us" className="hover:text-gray-500" onClick={toggleMobileMenu}>More</Link>
+          {isLoggedIn ? (
+            <>
+              <button className="hover:text-gray-500 text-left" onClick={toggleProfileDropdown}>Profile</button>
+              {isProfileDropdownOpen && (
+                <div className="profile-dropdown mt-2 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md absolute right-0 w-40 flex flex-col items-center justify-center">
+                  <Link to="/profile" className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 text-center">View Profile</Link>
+                  <button onClick={handleLogout} className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 text-center">Logout</button>
+                </div>
+              )}
+            </>
+          ) : (
+            <button onClick={handleLoginClick} className="hover:text-gray-500">Login</button>
+          )}
         </nav>
+      </div>
 
-        {/* Login Dropdown */}
-        <div className="relative">
-          {/* Login Button */}
-          <button
-            className="text-gray-700 hover:text-gray-900 focus:outline-none"
-            onClick={() => setShowDropdown(!showDropdown)}
-          >
-            Login
-          </button>
+      <nav className="hidden md:flex space-x-6">
+        <Link to="/" className="hover:text-gray-500">Find Job</Link>
+        <Link to="/find-company" className="hover:text-gray-500">Find Company</Link>
+        <Link to="/blog" className="hover:text-gray-500">Blog</Link>
+        <Link to="/contact-us" className="hover:text-gray-500">Contact Us</Link>
+      </nav>
 
-          {/* Dropdown */}
-          {showDropdown && (
-            <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-md w-80 p-6 z-50">
-              <h4 className="text-lg font-semibold text-gray-800 mb-4">
-                Log in to your account
-              </h4>
-              {/* Login Form */}
-              <form>
-                {/* Email Field */}
-                <div className="mb-4">
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="you@example.com"
-                  />
-                </div>
-
-                {/* Password Field */}
-                <div className="mb-4">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    id="password"
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="••••••••"
-                  />
-                </div>
-
-                {/* Login Button */}
-                <button
-                  type="submit"
-                  className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-                >
-                  Log In
-                </button>
-              </form>
-
-              {/* Other Options */}
-              <div className="mt-4 text-sm text-gray-600">
-                <p className="text-center">
-                  Don't have an account?{" "}
-                  <button
-                    onClick={handleCreateAccount}
-                    className="text-blue-500 hover:underline"
-                  >
-                    Create Account
-                  </button>
-                </p>
-                <p className="text-center mt-2">
-                  <a
-                    href="/forgot-password"
-                    className="text-blue-500 hover:underline"
-                  >
-                    Forgot Password?
-                  </a>
-                </p>
-              </div>
+      <div className="hidden md:flex items-center space-x-4">
+        {isLoggedIn ? (
+          <>
+          <button className="hover:text-gray-500 text-left" onClick={toggleProfileDropdown}>Profile</button>
+          {isProfileDropdownOpen && (
+            <div className="profile-dropdown mt-2 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md absolute right-0 w-40 flex flex-col items-center justify-center">
+              <Link to="/profile" className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 text-center">View Profile</Link>
+              <button onClick={handleLogout} className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 text-center">Logout</button>
             </div>
           )}
-        </div>
+        </>
+        ) : (
+          <button onClick={handleLoginClick} className="hover:text-gray-500">Login</button>
+        )}
       </div>
+
+      {/* Login Popup */}
+      {isLoginPopupOpen && (
+        <div className="absolute top-16 right-0 z-50">
+          <LoginDropdown setIsTyping={() => { }} />
+        </div>
+      )}
     </header>
   );
-};
+}
 
 export default Header;

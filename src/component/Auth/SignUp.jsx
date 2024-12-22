@@ -1,15 +1,43 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import PhoneInput from "react-phone-number-input";
-import 'react-phone-number-input/style.css'; // Importing the style for phone number input
+import "react-phone-number-input/style.css"; // Importing the style for phone number input
+import { register } from "../../Redux/Auth/Action";
 
 const SignUp = () => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [location, setLocation] = useState("");
+  const [locationDescription, setLocationDescription] = useState("");
   const [phoneNumber, setPhoneNumber] = useState(""); // State for phone number
+
+  const dispatch = useDispatch(); // Hook to dispatch actions
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted");
-    // Handle form submission logic here
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    const userData = {
+      firstName,
+      lastName,
+      email,
+      password,
+      confirmPassword,
+      phoneNumber,
+      location,
+      locationDescription,
+    };
+
+    // Dispatch the register action
+    dispatch(register(userData));
+    console.log("Register action dispatched with:", userData);
   };
 
   return (
@@ -24,6 +52,8 @@ const SignUp = () => {
           <input
             type="text"
             id="firstName"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             placeholder="John"
             required
@@ -38,6 +68,8 @@ const SignUp = () => {
           <input
             type="text"
             id="lastName"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             placeholder="Doe"
             required
@@ -66,6 +98,8 @@ const SignUp = () => {
           <input
             type="email"
             id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             placeholder="you@example.com"
             required
@@ -80,6 +114,8 @@ const SignUp = () => {
           <input
             type="password"
             id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             placeholder="********"
             required
@@ -94,19 +130,12 @@ const SignUp = () => {
           <input
             type="password"
             id="confirmPassword"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             placeholder="********"
             required
           />
-        </div>
-
-        {/* Delivery Location Information */}
-        <div className="mb-4">
-          <p className="text-sm text-gray-600">
-            To ensure your order gets to you as quickly as possible, we use GPS coordinates to locate you.
-            Create your first delivery location below by telling us more about where you are and pinning your location on the map below. 
-            It is very important that your pin is accurate; otherwise, your order may take longer than expected to deliver.
-          </p>
         </div>
 
         {/* Location Name */}
@@ -117,10 +146,10 @@ const SignUp = () => {
           <input
             type="text"
             id="locationName"
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Home, Office, etc."
             value={location}
             onChange={(e) => setLocation(e.target.value)}
+            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Home, Office, etc."
             required
           />
         </div>
@@ -132,29 +161,12 @@ const SignUp = () => {
           </label>
           <textarea
             id="locationDescription"
+            value={locationDescription}
+            onChange={(e) => setLocationDescription(e.target.value)}
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             placeholder="E.g., Apartment 4B, near the big park."
             rows="3"
           />
-        </div>
-
-        {/* Map for Pinning Location */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Pin Your Location
-          </label>
-          <div className="h-64 w-full border border-gray-300 rounded-md">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d18499.68485934746!2d38.495503500000005!3d7.032923149999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2set!4v1734769639723!5m2!1sen!2set"
-              width="100%" 
-              height="450" 
-              style={{ border: 0 }}
-              allowFullScreen=""
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="h-64"
-            ></iframe>
-          </div>
         </div>
 
         {/* Submit Button */}

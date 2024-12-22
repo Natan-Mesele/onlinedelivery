@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { FaShoppingCart } from "react-icons/fa"; // Importing a cart icon from react-icons
+import { FaShoppingCart } from "react-icons/fa"; 
 
 const RestaurantDetail = () => {
   const location = useLocation();

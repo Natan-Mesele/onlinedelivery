@@ -7,6 +7,7 @@ import RestaurantDetail from "./component/Restaurant/RestaurantDetail";
 import AllRestaurants from "./component/Restaurant/AllRestaurants";
 import DrinksPage from "./component/Restaurant/DrinksPage";
 import NearbyRestaurantsPage from "./component/Restaurant/NearbyRestaurantsPage";
+import UserProfile from "./component/Page/UserProfile";
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
         <Route path="/restaurants" element={<AllRestaurants />} />
         <Route path="/drinks" element={<DrinksPage />} />
         <Route path="/nearby" element={<NearbyRestaurantsPage />} />
+        <Route path="/profile" element={<UserProfile />} />
       </Routes>
     </div>
   );
