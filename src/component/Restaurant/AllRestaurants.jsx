@@ -1,42 +1,35 @@
 // src/component/Restaurant/AllRestaurants.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios"; // Import axios
 import RestaurantCard from "./RestaurantCard"; // Assuming you already have the RestaurantCard component
 import { FaFilter } from "react-icons/fa"; // Importing filter icon
 
 const AllRestaurants = () => {
-    // Sample data for all restaurants (this can be fetched from an API in a real-world scenario)
-    const restaurants = [
-        {
-            id: 1,
-            name: "Pasta Palace",
-            image: "https://images.unsplash.com/photo-1484980972926-edee96e0960d?q=80&w=1287&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            description: "Delicious homemade pasta with a wide variety of sauces.",
-            rating: "4.7",
-            isOpen: true
-        },
-        {
-            id: 2,
-            name: "Burger Haven",
-            image: "https://images.unsplash.com/photo-1523218345414-cd47aea19ba6?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            description: "Serving the best burgers with fresh ingredients and a variety of toppings.",
-            rating: "4.5",
-            isOpen: false
-        },
-        {
-            id: 3,
-            name: "Sushi World",
-            image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1453&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            description: "Fresh sushi and Japanese dishes for sushi lovers.",
-            rating: "4.9",
-            isOpen: true
-        }
-    ];
+    const [restaurants, setRestaurants] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // State to hold the search query, filter for open restaurants, and sort option
+    // States for filtering and sorting
     const [searchQuery, setSearchQuery] = useState("");
     const [isOpenOnly, setIsOpenOnly] = useState(false);
-    const [sortOption, setSortOption] = useState("rating"); // Default to sorting by rating
+    const [sortOption, setSortOption] = useState("rating");
 
+    // Fetch restaurants from the API
+    useEffect(() => {
+        const fetchRestaurants = async () => {
+            try {
+                const response = await axios.get("http://localhost:8080/restaurants"); 
+                setRestaurants(response.data);
+                setLoading(false);
+            } catch (err) {
+                setError("Failed to fetch restaurants");
+                setLoading(false);
+            }
+        };
+
+        fetchRestaurants();
+    }, []);
+    
     // Filter and sort restaurants based on the search query, open status, and sort option
     const filteredRestaurants = restaurants
         .filter(

@@ -7,7 +7,8 @@ import RestaurantDetail from "./component/Restaurant/RestaurantDetail";
 import AllRestaurants from "./component/Restaurant/AllRestaurants";
 import DrinksPage from "./component/Restaurant/DrinksPage";
 import NearbyRestaurantsPage from "./component/Restaurant/NearbyRestaurantsPage";
-import UserProfile from "./component/Page/UserProfile";
+import UserProfile from "./component/UserProfile/UserProfile";
+import CheckOut from "./component/Restaurant/CheckOut";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
         <Route path="/drinks" element={<DrinksPage />} />
         <Route path="/nearby" element={<NearbyRestaurantsPage />} />
         <Route path="/profile" element={<UserProfile />} />
+        <Route path="/check" element={<CheckOut />} />
       </Routes>
     </div>
   );

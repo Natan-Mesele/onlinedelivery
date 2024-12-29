@@ -1,4 +1,4 @@
-import { GET_USER_REQUEST, GET_USER_SUCCESS, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT, REGISTER_REQUEST, REGISTER_SUCCESS } from "./ActionType";
+import { GET_USER_REQUEST, GET_USER_SUCCESS, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT, REGISTER_REQUEST, REGISTER_SUCCESS, UPDATE_PROFILE_SUCCESS } from "./ActionType";
 
 const initialState = {
   user: null,
@@ -39,8 +39,19 @@ export const authReducer = (state = initialState, action) => {
     case GET_USER_SUCCESS:
       return { ...state, loading: false, error: null, user: action.payload };
 
+      case UPDATE_PROFILE_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                user: action.payload,
+                error: null
+            };
+
     case LOGOUT:
-      return initialState;
+      return {
+        ...state,
+        jwt: null,
+    };
 
     default:
       return state;

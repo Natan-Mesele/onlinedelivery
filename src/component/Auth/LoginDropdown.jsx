@@ -1,17 +1,23 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "../../Redux/Auth/Action";
+import { useNavigate } from "react-router-dom";
 
 const LoginDropdown = ({ setIsTyping }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const userData = { email, password };
     dispatch(login(userData));
-    setIsTyping(false); // Reset typing state after submission
+
+    // Check if setIsTyping is provided before calling it
+    if (setIsTyping) {
+      setIsTyping(false); 
+    }
   };
 
   return (
@@ -30,7 +36,11 @@ const LoginDropdown = ({ setIsTyping }) => {
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
-              setIsTyping(true);
+
+              // Check if setIsTyping is provided before calling it
+              if (setIsTyping) {
+                setIsTyping(true); 
+              }
             }}
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
             placeholder="you@example.com"
@@ -48,7 +58,11 @@ const LoginDropdown = ({ setIsTyping }) => {
             value={password}
             onChange={(e) => {
               setPassword(e.target.value);
-              setIsTyping(true);
+
+              // Check if setIsTyping is provided before calling it
+              if (setIsTyping) {
+                setIsTyping(true);
+              }
             }}
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
             placeholder="••••••••"
@@ -68,7 +82,12 @@ const LoginDropdown = ({ setIsTyping }) => {
         <p className="text-center">
           Don't have an account?{" "}
           <button
-            onClick={() => setIsTyping(false)}
+            onClick={() => {
+              if (setIsTyping) {
+                setIsTyping(false);
+              }
+              navigate('/signup');
+            }}
             className="text-blue-500 hover:underline"
           >
             Create Account

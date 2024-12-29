@@ -1,22 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../../Redux/Auth/Action';
+import { getUser, logout } from '../../Redux/Auth/Action';
 import LoginDropdown from '../Auth/LoginDropdown';
+import { FaShoppingCart } from 'react-icons/fa';
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false); // State to manage login popup visibility
+  const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
 
+  const firstName = useSelector((state) => state.auth.firstName);
+  const lastName = useSelector((state) => state.auth.lastName);
   const isLoggedIn = useSelector((state) => !!state.auth.jwt);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const jwt = localStorage.getItem("jwt");
+  const user = useSelector((state) => state.auth.user);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const toggleProfileDropdown = () => setIsProfileDropdownOpen(!isProfileDropdownOpen);
+
+  const cartItems = useSelector((state) => state.cart.cartItems);
+  
+  const totalItemsInCart = Array.isArray(cartItems) 
+  ? cartItems.reduce((total, item) => total + item.quantity, 0)
+  : 0;
+
+  useEffect(() => {
+    dispatch(getUser(jwt));
+  }, [dispatch, jwt]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -25,30 +40,36 @@ function Header() {
   };
 
   const handleLoginClick = () => {
-    setIsLoginPopupOpen(prevState => !prevState); // Toggle the login popup state
+    setIsLoginPopupOpen(true);
   };
 
-  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest('.profile-dropdown') && isProfileDropdownOpen) {
         setIsProfileDropdownOpen(false);
       }
+      if (!event.target.closest('.login-popup') && isLoginPopupOpen) {
+        setIsLoginPopupOpen(false); // Close the login popup on outside click
+      }
     };
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isProfileDropdownOpen]);
+  }, [isProfileDropdownOpen, isLoginPopupOpen]);
+  
 
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between px-4 md:px-16 py-8 bg-white shadow-lg">
-      <div className="">
+      {/* Brand Logo */}
+      <div>
         <Link to="/">
-          <a href="#">online food delivery</a>
+          <span className="text-lg font-bold">Online Food Delivery</span>
         </Link>
       </div>
 
+      {/* Mobile Menu Button */}
       <div className="md:hidden">
         <button onClick={toggleMobileMenu} className="text-gray-700 hover:text-gray-900 focus:outline-none">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -57,6 +78,7 @@ function Header() {
         </button>
       </div>
 
+      {/* Mobile Navigation Menu */}
       <div className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <button onClick={toggleMobileMenu} className="absolute top-4 right-4 text-gray-700 hover:text-gray-900 focus:outline-none">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -64,53 +86,101 @@ function Header() {
           </svg>
         </button>
         <nav className="flex flex-col space-y-4 px-6 py-16">
-          <Link to="/" className="hover:text-gray-500" onClick={toggleMobileMenu}>Restaurants</Link>
-          <Link to="/find-company" className="hover:text-gray-500" onClick={toggleMobileMenu}>Drinks</Link>
-          <Link to="/blog" className="hover:text-gray-500" onClick={toggleMobileMenu}>Market</Link>
-          <Link to="/contact-us" className="hover:text-gray-500" onClick={toggleMobileMenu}>More</Link>
-          {isLoggedIn ? (
+          <Link to="/" className="flex items-center space-x-2 hover:text-gray-500 border-b border-gray-300 pb-2" onClick={toggleMobileMenu}>
+            <span>🍽️</span>
+            <span>Restaurants</span>
+          </Link>
+          <Link to="/find-company" className="flex items-center space-x-2 hover:text-gray-500 border-b border-gray-300 pb-2" onClick={toggleMobileMenu}>
+            <span>🍹</span>
+            <span>Drinks</span>
+          </Link>
+          <Link to="/blog" className="flex items-center space-x-2 hover:text-gray-500 border-b border-gray-300 pb-2" onClick={toggleMobileMenu}>
+            <span>🛍️</span>
+            <span>Market</span>
+          </Link>
+          <Link to="/contact-us" className="flex items-center space-x-2 hover:text-gray-500 border-b border-gray-300 pb-2" onClick={toggleMobileMenu}>
+            <span>📄</span>
+            <span>More</span>
+          </Link>
+          {isLoggedIn && (
             <>
-              <button className="hover:text-gray-500 text-left" onClick={toggleProfileDropdown}>Profile</button>
+              <button className="flex items-center space-x-2 hover:text-gray-500 text-left border-b border-gray-300 pb-2" onClick={toggleProfileDropdown}>
+                <span>👤</span>
+                <span>{user?.firstName} {user?.lastName}</span>
+              </button>
               {isProfileDropdownOpen && (
                 <div className="profile-dropdown mt-2 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md absolute right-0 w-40 flex flex-col items-center justify-center">
-                  <Link to="/profile" className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 text-center">View Profile</Link>
-                  <button onClick={handleLogout} className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 text-center">Logout</button>
+                  <Link to="/profile" className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 text-center">
+                    <span>👀 View Profile</span>
+                  </Link>
+                  <button onClick={handleLogout} className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 text-center">
+                    <span>🚪 Logout</span>
+                  </button>
                 </div>
               )}
             </>
-          ) : (
-            <button onClick={handleLoginClick} className="hover:text-gray-500">Login</button>
           )}
         </nav>
       </div>
 
+      {/* Desktop Navigation Menu */}
       <nav className="hidden md:flex space-x-6">
-        <Link to="/" className="hover:text-gray-500">Find Job</Link>
-        <Link to="/find-company" className="hover:text-gray-500">Find Company</Link>
-        <Link to="/blog" className="hover:text-gray-500">Blog</Link>
-        <Link to="/contact-us" className="hover:text-gray-500">Contact Us</Link>
+        <Link to="/" className="flex items-center space-x-2 hover:text-gray-500">
+          <span>🍽️</span>
+          <span>Restaurants</span>
+        </Link>
+        <Link to="/find-company" className="flex items-center space-x-2 hover:text-gray-500">
+          <span>🍹</span>
+          <span>Drinks</span>
+        </Link>
+        <Link to="/blog" className="flex items-center space-x-2 hover:text-gray-500">
+          <span>🛍️</span>
+          <span>Market</span>
+        </Link>
+        <Link to="/contact-us" className="flex items-center space-x-2 hover:text-gray-500">
+          <span>📄</span>
+          <span>More</span>
+        </Link>
       </nav>
 
+      {/* Desktop Profile/Login Section */}
       <div className="hidden md:flex items-center space-x-4">
         {isLoggedIn ? (
           <>
-          <button className="hover:text-gray-500 text-left" onClick={toggleProfileDropdown}>Profile</button>
-          {isProfileDropdownOpen && (
-            <div className="profile-dropdown mt-2 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md absolute right-0 w-40 flex flex-col items-center justify-center">
-              <Link to="/profile" className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 text-center">View Profile</Link>
-              <button onClick={handleLogout} className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 text-center">Logout</button>
-            </div>
-          )}
-        </>
+            <button className="flex items-center space-x-2 hover:text-gray-500 text-left" onClick={toggleProfileDropdown}>
+              <span>👤</span>
+              <span>{user?.firstName} </span>
+              <span>{user?.lastName}</span>
+            </button>
+            <Link to="/check" className="relative block w-full px-4 py-2 text-gray-700 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 text-left">
+              <FaShoppingCart className="w-6 h-6" />
+              {totalItemsInCart > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{totalItemsInCart}</span>
+              )}
+            </Link>
+            {isProfileDropdownOpen && (
+              <div className="profile-dropdown mt-44 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md absolute right-16 w-40 flex flex-col items-center justify-center">
+                <Link to="/profile" className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 text-left">
+                  <span>👀 View Profile</span>
+                </Link>
+                <button onClick={handleLogout} className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 text-left">
+                  <span>🚪 Logout</span>
+                </button>
+              </div>
+            )}
+          </>
         ) : (
-          <button onClick={handleLoginClick} className="hover:text-gray-500">Login</button>
+          <button onClick={handleLoginClick} className="flex items-center space-x-2 hover:text-gray-500">
+            <span>🔑</span>
+            <span>Login</span>
+          </button>
         )}
       </div>
 
       {/* Login Popup */}
       {isLoginPopupOpen && (
-        <div className="absolute top-16 right-0 z-50">
-          <LoginDropdown setIsTyping={() => { }} />
+        <div className="login-popup absolute top-20 right-8 z-50 bg-white shadow-lg rounded-lg p-4">
+          <LoginDropdown setIsLoginPopupOpen={setIsLoginPopupOpen} />
         </div>
       )}
     </header>

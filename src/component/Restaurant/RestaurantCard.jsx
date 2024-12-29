@@ -1,9 +1,20 @@
 import React from "react";
-import { FaStar } from "react-icons/fa"; 
-import { Link } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
+import { FaStar } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
 
-const RestaurantCard = ({ id, name, image, description, rating, isOpen, deliveryDay }) => {
-  const starRating = parseFloat(rating); 
+const RestaurantCard = ({ id, name, images, description, rating, open }) => {
+  console.log("RestaurantCard Props:", { id, name, images, description, rating, open });
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.user);
+
+  const isUserLoggedIn = user !== null;
+  const starRating = parseFloat(rating);
+
+  // Ensure open is a boolean (in case it comes as a string)
+  const isRestaurantOpen = typeof open === "boolean" ? open : open === "true";
 
   const renderStars = () => {
     let stars = [];
@@ -18,11 +29,23 @@ const RestaurantCard = ({ id, name, image, description, rating, isOpen, delivery
     return stars;
   };
 
+  const handleCardClick = () => {
+    if (!isUserLoggedIn) {
+      alert("You must log in to view the restaurant details.");
+      navigate("/login"); // Redirect user to login page if not logged in
+    } else {
+      navigate(`/restaurant/${id}`); // Navigate to restaurant details page if logged in
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-      <Link to={{ pathname: `/restaurant/${id}`, state: { id, name, image, description, rating, isOpen, deliveryDay } }}>
+      <div
+        className="cursor-pointer"
+        onClick={handleCardClick} // Handle click on restaurant card
+      >
         <img
-          src={image}
+          src={images}
           alt={name}
           className="w-full h-48 object-cover"
         />
@@ -33,11 +56,13 @@ const RestaurantCard = ({ id, name, image, description, rating, isOpen, delivery
             <div className="flex">{renderStars()}</div>
             <span className="ml-2 text-gray-500">{rating} Rating</span>
           </div>
-          <div className={`mt-4 text-sm font-semibold ${isOpen ? 'text-green-500' : 'text-red-500'}`}>
-            {isOpen ? "Open Now" : "Closed"}
+          <div
+            className={`mt-4 text-sm font-semibold ${open ? "text-green-500" : "text-red-500"}`}
+          >
+            {open ? "Open Now" : "Closed"}
           </div>
         </div>
-      </Link>
+      </div>
     </div>
   );
 };
