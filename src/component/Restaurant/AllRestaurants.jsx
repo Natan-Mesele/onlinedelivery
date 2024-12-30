@@ -1,36 +1,33 @@
-// src/component/Restaurant/AllRestaurants.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios"; // Import axios
-import RestaurantCard from "./RestaurantCard"; // Assuming you already have the RestaurantCard component
-import { FaFilter } from "react-icons/fa"; // Importing filter icon
+import RestaurantCard from "./RestaurantCard"; 
+import { FaFilter } from "react-icons/fa"; 
+import { fetchRestaurantById, getAllRestaurants } from "../../Redux/Restaurant/Action";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom"; 
 
 const AllRestaurants = () => {
-    const [restaurants, setRestaurants] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    // States for filtering and sorting
+    const { id } = useParams(); 
+    const loading = useSelector((state) => state.restaurant.loading);
+    const error = useSelector((state) => state.restaurant.error);
     const [searchQuery, setSearchQuery] = useState("");
     const [isOpenOnly, setIsOpenOnly] = useState(false);
     const [sortOption, setSortOption] = useState("rating");
+    const [currentPage, setCurrentPage] = useState(1); // Added state for current page
+    const [pageSize, setPageSize] = useState(9); // Added state for page size
+    const dispatch = useDispatch();
+    const restaurants = useSelector((state) => state.restaurant.restaurants);
+    const cartItems = useSelector((state) => state.cart.cartItems); 
 
-    // Fetch restaurants from the API
     useEffect(() => {
-        const fetchRestaurants = async () => {
-            try {
-                const response = await axios.get("http://localhost:8080/restaurants"); 
-                setRestaurants(response.data);
-                setLoading(false);
-            } catch (err) {
-                setError("Failed to fetch restaurants");
-                setLoading(false);
-            }
-        };
+        dispatch(getAllRestaurants());
+    }, [dispatch]);
 
-        fetchRestaurants();
-    }, []);
-    
-    // Filter and sort restaurants based on the search query, open status, and sort option
+    useEffect(() => {
+        if (id) {
+            dispatch(fetchRestaurantById(id)); 
+        }
+    }, [dispatch, id]);
+
     const filteredRestaurants = restaurants
         .filter(
             (restaurant) =>
@@ -47,15 +44,27 @@ const AllRestaurants = () => {
             return 0;
         });
 
+    // Pagination logic
+    const totalRestaurants = filteredRestaurants.length;
+    const totalPages = Math.ceil(totalRestaurants / pageSize);
+    const displayedRestaurants = filteredRestaurants.slice(
+        (currentPage - 1) * pageSize,
+        currentPage * pageSize
+    );
+
+    // Calculate total number of items in the cart
+    const totalItemsInCart = Array.isArray(cartItems)
+        ? cartItems.reduce((total, item) => total + item.quantity, 0)
+        : 0;
+
     return (
         <div className="py-12 px-6 flex gap-16 mx-auto max-w-7xl">
             {/* Filter and Sort Section */}
             <div className=" flex flex-col">
-                <div className="flex items-center gap-4 ">
+                <div className="flex items-center gap-2 ">
                     <FaFilter className="text-gray-600 text" />
-                    <label className="text-lg font-semibold text-gray-800">Filter By:</label>
+                    <span className="text-lg font-semibold text-gray-800 whitespace-nowrap">Filter By:</span>
                 </div>
-
                 {/* Filter by Open Restaurants */}
                 <div className="flex items-center gap-2 my-6 ">
                     <input
@@ -95,21 +104,40 @@ const AllRestaurants = () => {
                     </select>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredRestaurants.length > 0 ? (
-                        filteredRestaurants.map((restaurant) => (
+                    {displayedRestaurants.length > 0 ? (
+                        displayedRestaurants.map((restaurant) => (
                             <RestaurantCard
                                 key={restaurant.id}
                                 id={restaurant.id}
                                 name={restaurant.name}
-                                image={restaurant.image}
+                                images={restaurant.images}
                                 description={restaurant.description}
                                 rating={restaurant.rating}
-                                isOpen={restaurant.isOpen}
+                                open={restaurant.open}
                             />
                         ))
                     ) : (
                         <p className="text-center text-gray-500">No restaurants found</p>
                     )}
+                </div>
+                
+                {/* Pagination Controls */}
+                <div className="flex justify-center gap-4 my-6">
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 bg-gray-300 text-white rounded-lg disabled:opacity-50"
+                    >
+                        Prev
+                    </button>
+                    <span className="text-lg font-semibold">{currentPage} / {totalPages}</span>
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 bg-gray-300 text-white rounded-lg disabled:opacity-50"
+                    >
+                        Next
+                    </button>
                 </div>
             </div>
         </div>

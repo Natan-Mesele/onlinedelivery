@@ -23,6 +23,7 @@ const RestaurantDetail = () => {
   const user = useSelector((state) => state.auth.user);
   const isRestaurantOpen = restaurantDetails?.open;
   const isUserLoggedIn = user !== null;
+  console.log('Is user logged in?', isUserLoggedIn);
   const navigate = useNavigate();
 
   useEffect(() => {

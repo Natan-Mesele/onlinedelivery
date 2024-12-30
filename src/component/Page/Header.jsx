@@ -63,9 +63,9 @@ function Header() {
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between px-4 md:px-16 py-8 bg-white shadow-lg">
       {/* Brand Logo */}
-      <div>
+      <div className='w-16 h-16'>
         <Link to="/">
-          <span className="text-lg font-bold">Online Food Delivery</span>
+          <img src="public/nfood.png" alt="" className="w-full h-full object-contain" />
         </Link>
       </div>
 

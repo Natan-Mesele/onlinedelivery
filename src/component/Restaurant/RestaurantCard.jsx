@@ -13,7 +13,6 @@ const RestaurantCard = ({ id, name, images, description, rating, open }) => {
   const isUserLoggedIn = user !== null;
   const starRating = parseFloat(rating);
 
-  // Ensure open is a boolean (in case it comes as a string)
   const isRestaurantOpen = typeof open === "boolean" ? open : open === "true";
 
   const renderStars = () => {
@@ -33,8 +32,10 @@ const RestaurantCard = ({ id, name, images, description, rating, open }) => {
     if (!isUserLoggedIn) {
       alert("You must log in to view the restaurant details.");
       navigate("/login"); // Redirect user to login page if not logged in
+    } else if (!isRestaurantOpen) {
+      alert("This restaurant is currently closed.");
     } else {
-      navigate(`/restaurant/${id}`); // Navigate to restaurant details page if logged in
+      navigate(`/restaurant/${id}`); // Navigate to restaurant details page if logged in and open
     }
   };
 
@@ -57,9 +58,9 @@ const RestaurantCard = ({ id, name, images, description, rating, open }) => {
             <span className="ml-2 text-gray-500">{rating} Rating</span>
           </div>
           <div
-            className={`mt-4 text-sm font-semibold ${open ? "text-green-500" : "text-red-500"}`}
+            className={`mt-4 text-sm font-semibold ${isRestaurantOpen ? "text-green-500" : "text-red-500"}`}
           >
-            {open ? "Open Now" : "Closed"}
+            {isRestaurantOpen ? "Open Now" : "Closed"}
           </div>
         </div>
       </div>

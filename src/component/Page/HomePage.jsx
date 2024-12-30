@@ -13,28 +13,28 @@ const HomePage = () => {
         }}
       >
         <div className="absolute"></div>
-        <div className="relative z-10 flex items-center justify-center h-full text-left text-white px-6 md:px-12">
+        <div className="relative z-10 flex items-center justify-center h-full text-left text-white px-6 md:px-64">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Welcome to Our Amazing Platform
+              Savor meals from your favorite Unique restaurants, delivered to your door or office.
             </h1>
-            <p className="text-lg mb-8">
-              We provide innovative solutions for your needs. Explore our features and services today!
+            <p className="text-2xl mb-8">
+              Craving a meal without going out? Explore nearby restaurants and order your favorites.
             </p>
             <div className="flex flex-col md:flex-row gap-4">
               {/* Link to Nearby Restaurants page */}
               <Link to="/nearby">
-                <button className="text-blue-500 border border-blue-500 py-2 px-6 rounded-lg hover:bg-blue-500 hover:text-white transition duration-300">
+                <button className="text-gray-250 border border-green-600 py-4 px-8 rounded-lg hover:bg-green-600 hover:text-white transition duration-300 text-lg">
                   Restaurants Near You
                 </button>
               </Link>
               <Link to="/restaurants">
-                <button className="text-blue-500 border border-blue-500 py-2 px-6 rounded-lg hover:bg-blue-500 hover:text-white transition duration-300">
+                <button className="text-gray-250 border border-green-600 py-4 px-8 rounded-lg hover:bg-green-600 hover:text-white transition duration-300 text-lg">
                   View All Our Restaurants
                 </button>
               </Link>
               <Link to="/drinks">
-                <button className="text-blue-500 border border-blue-500 py-2 px-6 rounded-lg hover:bg-blue-500 hover:text-white transition duration-300">
+                <button className="text-gray-250 border border-green-600 py-4 px-8 rounded-lg hover:bg-green-600 hover:text-white transition duration-300 text-lg">
                   Drinks: Wine, Beer & More
                 </button>
               </Link>
