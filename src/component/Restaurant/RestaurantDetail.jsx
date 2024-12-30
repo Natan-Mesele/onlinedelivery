@@ -1,6 +1,6 @@
 // components/RestaurantDetail.js
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { FaShoppingCart } from 'react-icons/fa';
 import { fetchRestaurantById, getAllRestaurants } from '../../Redux/Restaurant/Action';
@@ -23,6 +23,7 @@ const RestaurantDetail = () => {
   const user = useSelector((state) => state.auth.user);
   const isRestaurantOpen = restaurantDetails?.open;
   const isUserLoggedIn = user !== null;
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (id) {
@@ -32,7 +33,7 @@ const RestaurantDetail = () => {
   }, [dispatch, id]);
 
   useEffect(() => {
-    dispatch(getAllRestaurants())
+    dispatch(getAllRestaurants());
     dispatch(getCart());
   }, [dispatch]);
 
@@ -56,7 +57,6 @@ const RestaurantDetail = () => {
 
     dispatch(addToCart(food.id));
   };
-
 
   const calculateTotal = () => {
     return cartItemsFromRedux.reduce((total, item) => total + item.price, 0);
@@ -88,6 +88,14 @@ const RestaurantDetail = () => {
     }
 
     setSelectedIngredients(updatedSelectedIngredients);
+  };
+
+  const handleCheckout = () => {
+    if (!isUserLoggedIn) {
+      alert('Please log in to proceed with the checkout.');
+      return;
+    }
+    navigate('/check');
   };
 
   return (
@@ -174,27 +182,32 @@ const RestaurantDetail = () => {
             {/* Checkout Section */}
             <div className="w-1/4 bg-gray-50 p-6 rounded-lg shadow-lg">
               <h4 className="text-2xl font-semibold text-gray-800 mb-6">Checkout</h4>
-              {cartItemsFromRedux && cartItemsFromRedux.length > 0 ? (
+              {cartItemsFromRedux?.items && cartItemsFromRedux.items.length > 0 ? (
                 <>
                   <ul className="space-y-4">
-                    {cartItemsFromRedux.map((items, index) => (
+                    {cartItemsFromRedux.items.map((item, index) => (
                       <li key={index} className="flex justify-between items-center">
                         <div>
-                          <p className="text-lg font-semibold text-gray-800">{items.foodMenu?.title}</p>
-                          <p className="text-sm text-gray-600">Quantity: {items.quantity}</p>
+                          <p className="text-lg font-semibold text-gray-800">
+                            {item.foodMenu?.title}
+                          </p>
+                          <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
                         </div>
-                        <p className="text-lg text-gray-800">{items.totalPrice} ETB</p>
+                        <p className="text-lg text-gray-800">{item.totalPrice} ETB</p>
                       </li>
                     ))}
                   </ul>
-                  <div className="mt-6">
-                    <p className="text-lg font-semibold text-gray-800">
-                      Total: <span className="text-green-500">{calculateTotal()} ETB</span>
-                    </p>
+                  <div className="mt-6 flex items-center justify-between">
+                    <p className="text-lg font-semibold text-gray-800 ">Total:  </p>
+                    <span className="text-green-500">{cartItemsFromRedux.totalPrice} ETB</span>
                   </div>
                   <button
-                    className="mt-4 w-full bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg"
-                    onClick={() => alert('Proceeding to checkout...')}
+                    className={`mt-4 w-full p-3 rounded-lg ${cartItemsFromRedux.items.length > 0
+                        ? 'bg-green-500 hover:bg-green-600 text-white'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                    onClick={handleCheckout}
+                    disabled={cartItemsFromRedux.items.length === 0}
                   >
                     Proceed to Checkout
                   </button>
@@ -203,7 +216,6 @@ const RestaurantDetail = () => {
                 <p>Your cart is empty.</p>
               )}
             </div>
-
           </div>
         </>
       ) : (
