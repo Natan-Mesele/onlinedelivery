@@ -9,6 +9,8 @@ import DrinksPage from "./component/Restaurant/DrinksPage";
 import NearbyRestaurantsPage from "./component/Restaurant/NearbyRestaurantsPage";
 import UserProfile from "./component/UserProfile/UserProfile";
 import CheckOut from "./component/Restaurant/CheckOut";
+import Footer from "./component/Page/Footer";
+import FreshFeast from "./component/Page/FreshFeast";
 
 const App = () => {
   return (
@@ -26,7 +28,9 @@ const App = () => {
         <Route path="/nearby" element={<NearbyRestaurantsPage />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/check" element={<CheckOut />} />
+        <Route path="/fresh" element={<FreshFeast />} />
       </Routes>
+      <Footer />
     </div>
   );
 };

@@ -90,13 +90,13 @@ function Header() {
             <span>🍽️</span>
             <span>Restaurants</span>
           </Link>
-          <Link to="/find-company" className="flex items-center space-x-2 hover:text-gray-500 border-b border-gray-300 pb-2" onClick={toggleMobileMenu}>
+          <Link to="/drinks" className="flex items-center space-x-2 hover:text-gray-500 border-b border-gray-300 pb-2" onClick={toggleMobileMenu}>
             <span>🍹</span>
             <span>Drinks</span>
           </Link>
-          <Link to="/blog" className="flex items-center space-x-2 hover:text-gray-500 border-b border-gray-300 pb-2" onClick={toggleMobileMenu}>
+          <Link to="/fresh" className="flex items-center space-x-2 hover:text-gray-500 border-b border-gray-300 pb-2" onClick={toggleMobileMenu}>
             <span>🛍️</span>
-            <span>Market</span>
+            <span>FreshFeast</span>
           </Link>
           <Link to="/contact-us" className="flex items-center space-x-2 hover:text-gray-500 border-b border-gray-300 pb-2" onClick={toggleMobileMenu}>
             <span>📄</span>
@@ -129,13 +129,13 @@ function Header() {
           <span>🍽️</span>
           <span>Restaurants</span>
         </Link>
-        <Link to="/find-company" className="flex items-center space-x-2 hover:text-gray-500">
+        <Link to="/drinks" className="flex items-center space-x-2 hover:text-gray-500">
           <span>🍹</span>
           <span>Drinks</span>
         </Link>
-        <Link to="/blog" className="flex items-center space-x-2 hover:text-gray-500">
+        <Link to="/fresh" className="flex items-center space-x-2 hover:text-gray-500">
           <span>🛍️</span>
-          <span>Market</span>
+          <span>FreshFeast</span>
         </Link>
         <Link to="/contact-us" className="flex items-center space-x-2 hover:text-gray-500">
           <span>📄</span>

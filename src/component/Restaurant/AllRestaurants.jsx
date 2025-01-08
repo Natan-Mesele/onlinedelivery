@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import RestaurantCard from "./RestaurantCard"; 
-import { FaFilter } from "react-icons/fa"; 
+import RestaurantCard from "./RestaurantCard";
+import { FaFilter } from "react-icons/fa";
 import { fetchRestaurantById, getAllRestaurants } from "../../Redux/Restaurant/Action";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom"; 
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
 const AllRestaurants = () => {
-    const { id } = useParams(); 
+    const { id } = useParams();
     const loading = useSelector((state) => state.restaurant.loading);
     const error = useSelector((state) => state.restaurant.error);
     const [searchQuery, setSearchQuery] = useState("");
@@ -14,17 +15,34 @@ const AllRestaurants = () => {
     const [sortOption, setSortOption] = useState("rating");
     const [currentPage, setCurrentPage] = useState(1); // Added state for current page
     const [pageSize, setPageSize] = useState(9); // Added state for page size
+    const [restaurants, setRestaurants] = useState([]); // Add setRestaurants here
     const dispatch = useDispatch();
-    const restaurants = useSelector((state) => state.restaurant.restaurants);
-    const cartItems = useSelector((state) => state.cart.cartItems); 
+    const cartItems = useSelector((state) => state.cart.cartItems);
+
+    const fetchRestaurants = async () => {
+        try {
+            const response = await axios.get("http://localhost:8080/restaurant"); // Replace with your actual API endpoint
+            console.log(response.data); // Log data for debugging
+            if (Array.isArray(response.data)) {
+                setRestaurants(response.data); // Ensure data is an array
+            } else {
+                throw new Error("Invalid data format. Expected an array.");
+            }
+            setLoading(false);
+        } catch (err) {
+            console.error(err); // Log error for debugging
+            setError("Failed to fetch restaurants.");
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        dispatch(getAllRestaurants());
-    }, [dispatch]);
+        fetchRestaurants();
+    }, []);
 
     useEffect(() => {
         if (id) {
-            dispatch(fetchRestaurantById(id)); 
+            dispatch(fetchRestaurantById(id));
         }
     }, [dispatch, id]);
 
@@ -33,7 +51,7 @@ const AllRestaurants = () => {
             (restaurant) =>
                 (restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     restaurant.description.toLowerCase().includes(searchQuery.toLowerCase())) &&
-                (!isOpenOnly || restaurant.isOpen)
+                (!isOpenOnly || restaurant.open)
         )
         .sort((a, b) => {
             if (sortOption === "rating") {
@@ -120,7 +138,7 @@ const AllRestaurants = () => {
                         <p className="text-center text-gray-500">No restaurants found</p>
                     )}
                 </div>
-                
+
                 {/* Pagination Controls */}
                 <div className="flex justify-center gap-4 my-6">
                     <button
